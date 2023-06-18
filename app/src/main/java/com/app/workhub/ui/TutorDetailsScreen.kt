@@ -30,7 +30,6 @@ fun TutorDetailScreen(navController: NavController, screenState: TutorDetailsScr
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        val tutor = LocalContext.current.applicationContext
         //toolbar (this would be removed later for scaffold , for now just use it)
         Row(
             modifier = Modifier
