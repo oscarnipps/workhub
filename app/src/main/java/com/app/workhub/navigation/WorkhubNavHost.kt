@@ -11,6 +11,7 @@ import com.app.workhub.Constants.TUTOR_DETAILS_SCREEN_ROUTE_PARAM
 import com.app.workhub.ui.TutorDetailScreen
 import com.app.workhub.ui.TutorDetailsScreenState
 import com.app.workhub.ui.TutorListScreen
+import com.app.workhub.ui.TutorReviewScreen
 
 @Composable
 fun WorkHubNavHost(
@@ -64,6 +65,10 @@ fun WorkHubNavHost(
 
                 TutorDetailScreen(navController, detailsScreenState)
             }
+        }
+
+        composable(route = WorkHubDestinations.TutorReviewScreen.route){
+            TutorReviewScreen()
         }
     }
 }

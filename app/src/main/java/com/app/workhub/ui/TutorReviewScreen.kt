@@ -10,6 +10,10 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,14 +54,19 @@ fun TutorReviewScreen() {
             )
         }
 
+        //search field composable
+        var reviewerName by remember{ mutableStateOf("")}
+
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            value = "",
-            onValueChange = {}
+            value = reviewerName,
+            label = {Text(text = "search for reviewer")},
+            onValueChange = {reviewerName = it}
         )
 
+        //reviewers section composable
         Column {
             Text(modifier = Modifier.padding(start = 16.dp), text = "Reviewers ( 0 )")
 

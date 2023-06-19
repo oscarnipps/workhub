@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.app.workhub.R
+import com.app.workhub.navigation.WorkHubDestinations
 
 @Composable
 fun TutorDetailScreen(navController: NavController, screenState: TutorDetailsScreenState) {
@@ -141,7 +142,7 @@ fun TutorDetailScreen(navController: NavController, screenState: TutorDetailsScr
 
         Button(
             onClick = {
-
+                navController.navigate(WorkHubDestinations.TutorReviewScreen.route)
             },
             modifier = Modifier
                 .fillMaxWidth()
