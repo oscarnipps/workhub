@@ -9,71 +9,58 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.app.workhub.R
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.app.workhub.data.getReviewers
 import com.app.workhub.models.Reviewer
 
 
 @Composable
-fun TutorReviewScreen() {
+fun TutorReviewScreen(
+    modifier: Modifier = Modifier,
+    reviewViewModel: TutorReviewViewModel = viewModel()
+) {
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier
     ) {
         //toolbar (this would be removed later for scaffold , for now just use it)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp)
-                .height(32.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.ArrowBack,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(24.dp)
-                    .align(Alignment.CenterVertically)
-            )
-            Text(
-                text = "Select Reviewer",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = 16.dp)
-            )
-        }
+        CustomToolbar(title = "Select Reviewer", icon = Icons.Rounded.ArrowBack)
 
         //search field composable
-        var reviewerName by remember{ mutableStateOf("")}
-
-        TextField(
+        ReviewerSearchField(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            value = reviewerName,
-            label = {Text(text = "search for reviewer")},
-            onValueChange = {reviewerName = it}
+            reviewerName = reviewViewModel.state.reviewerName,
+            onReviewerNameSearchChange = { name -> reviewViewModel.setReviewerName(name) }
         )
 
         //reviewers section composable
         Column {
-            Text(modifier = Modifier.padding(start = 16.dp), text = "Reviewers ( 0 )")
+            Text(
+                modifier = Modifier.padding(start = 16.dp),
+                text = "Reviewers ( ${reviewViewModel.state.addedReviewers.size} )"
+            )
 
             LazyColumn(contentPadding = PaddingValues(16.dp)) {
 
-                items(items = getReviewers()) {
-                    ReviewListItem(it)
+                items(items = getReviewers()) { reviewerItem ->
+
+                    ReviewListItem(
+                        modifier = Modifier.fillMaxWidth(),
+                        reviewerName = reviewerItem.name,
+                        reviewerImageId = reviewerItem.profileImage,
+                        isReviewerAdded = reviewViewModel.isReviewerAdded(reviewerItem.name),
+                        onReviewerChecked = { reviewViewModel.addReviewer(reviewerItem.name) }
+                    )
+
                     Divider(modifier = Modifier.padding(start = 32.dp, end = 16.dp))
                 }
             }
@@ -96,13 +83,33 @@ fun TutorReviewScreen() {
 }
 
 @Composable
-fun ReviewListItem(reviewer: Reviewer) {
-    Row(
-        modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
-    ) {
+private fun ReviewerSearchField(
+    modifier: Modifier,
+    reviewerName: String,
+    onReviewerNameSearchChange: (String) -> Unit
+) {
+    TextField(
+        modifier = modifier,
+        value = reviewerName,
+        label = { Text(text = "search for reviewer") },
+        onValueChange = { onReviewerNameSearchChange(it) }
+    )
+}
 
+@Composable
+fun ReviewListItem(
+    modifier: Modifier = Modifier,
+    reviewerName: String,
+    reviewerImageId: Int,
+    isReviewerAdded: Boolean,
+    onReviewerChecked: (String) -> Unit
+) {
+
+    Row(
+        modifier = modifier, verticalAlignment = Alignment.CenterVertically
+    ) {
         Image(
-            painter = painterResource(id = reviewer.profileImage),
+            painter = painterResource(id = reviewerImageId),
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .padding(end = 16.dp)
@@ -111,32 +118,22 @@ fun ReviewListItem(reviewer: Reviewer) {
             contentDescription = null
         )
 
-        Text(
-            text = reviewer.name
-        )
+        Text(text = reviewerName)
 
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .padding(end = 8.dp)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 8.dp)
+        ) {
             Checkbox(
                 modifier = Modifier.align(Alignment.CenterEnd),
-                checked = false,
-                onCheckedChange = {}
+                checked = isReviewerAdded,
+                onCheckedChange = { onReviewerChecked(reviewerName) }
             )
         }
 
     }
 
-}
-
-fun getReviewers(): List<Reviewer> {
-    return listOf(
-        Reviewer("panini davies ali", R.drawable.tutor3),
-        Reviewer("piki jones ", R.drawable.tutor4),
-        Reviewer("alison becker", R.drawable.tutor2),
-        Reviewer("james deen", R.drawable.tutor1),
-        Reviewer("peter gregory", R.drawable.tutor4)
-    )
 }
 
 

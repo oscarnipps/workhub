@@ -1,6 +1,8 @@
 package com.app.workhub.navigation
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -8,10 +10,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.app.workhub.Constants
 import com.app.workhub.Constants.TUTOR_DETAILS_SCREEN_ROUTE_PARAM
-import com.app.workhub.ui.TutorDetailScreen
-import com.app.workhub.ui.TutorDetailsScreenState
-import com.app.workhub.ui.TutorListScreen
-import com.app.workhub.ui.TutorReviewScreen
+import com.app.workhub.data.getTutors
+import com.app.workhub.ui.*
 
 @Composable
 fun WorkHubNavHost(
@@ -24,7 +24,19 @@ fun WorkHubNavHost(
     ) {
 
         composable(route = WorkHubDestinations.TutorListScreen.route) {
-            TutorListScreen(navController)
+
+            TutorListScreen(
+                tutors = getTutors(),
+                onTutorItemClicked = { tutor ->
+                    navController.navigate(
+                        WorkHubDestinations.TutorDetailsScreen.withArgs(
+                            tutor.name,
+                            tutor.profileImage,
+                            tutor.reviews,
+                            tutor.rate
+                        )
+                    )
+                })
         }
 
         composable(
@@ -63,12 +75,18 @@ fun WorkHubNavHost(
                     it.getString(Constants.RATE_ARG_KEY, "")
                 )
 
-                TutorDetailScreen(navController, detailsScreenState)
+                TutorDetailScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    onConfirmButtonClicked = {
+                        navController.navigate(WorkHubDestinations.TutorReviewScreen.route)
+                    },
+                    screenState = detailsScreenState
+                )
             }
         }
 
-        composable(route = WorkHubDestinations.TutorReviewScreen.route){
-            TutorReviewScreen()
+        composable(route = WorkHubDestinations.TutorReviewScreen.route) {
+            TutorReviewScreen( modifier = Modifier.fillMaxSize())
         }
     }
 }
